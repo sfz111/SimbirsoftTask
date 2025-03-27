@@ -33,17 +33,15 @@ def pytest_addoption(parser):
     parser.addoption(
         "--selenoid",
         action="store_true",
-        default=False,
         help="run tests using Selenoid"
     )
 
 @fixture(scope="function")
 def driver(request):
-    use_selenoid = request.config.getoption("--selenoid")
     options = Options()
     options.page_load_strategy = 'eager'
 
-    if use_selenoid:
+    if request.config.getoption("--selenoid"):
         # Конфигурация для Selenoid
         options.set_capability("browserName", "chrome")
         options.set_capability("browserVersion", "latest")

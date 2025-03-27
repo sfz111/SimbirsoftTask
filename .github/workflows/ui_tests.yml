@@ -34,7 +34,4 @@ jobs:
 
     - name: Run ui tests with Selenoid
       run: |
-        pytest tests/ --selenoid -v --alluredir=allure-results
-      env:
-        SELENOID_URL: http://selenoid:4444/wd/hub
-        BROWSER: "chrome"
+        pytest tests/ui -v -n 3 --selenoid --alluredir=allure-results
