@@ -1,4 +1,3 @@
-import allure
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -17,13 +16,13 @@ class CustomersPage(BasePage):
         self.click(self.FIRST_NAME_COLUMN)
         return self.get_names()
 
-    @allure.step("Получаем имена клиентов из таблицы")
     def get_names(self) -> list[str]:
         names = []
         self.wait.until(EC.visibility_of_element_located(self.TABLE_BODY),
                         "Тело таблицы клиентов не отображается на странице")
         for element in self.elements(self.FIRST_NAME_CUSTOMER):
             names.append(element.text)
+
         return names
 
     def delete_customer(self, name: str):

@@ -1,6 +1,6 @@
 import allure
 import pytest
-from _pytest.fixtures import fixture
+from pytest import fixture
 from allure_commons.types import AttachmentType
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -28,12 +28,21 @@ def pytest_exception_interact(node, call, report):
         except Exception as e:
             print(f"Не удалось сохранить скриншот: {e}")
 
+def pytest_addoption(parser):
+    parser.addoption(
+        "--headless",
+        action="store_true",
+        default=False,
+        help="Run tests in headless mode"
+    )
 
 @fixture(scope="function")
 def driver(request):
     options = Options()
     options.page_load_strategy = 'eager'
-    options.add_argument("--headless=new")
+    if request.config.getoption("--headless"):
+        options.add_argument("--headless=new")
+
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     request.cls.driver = driver
     driver.maximize_window()

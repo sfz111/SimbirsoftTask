@@ -1,6 +1,7 @@
 from random import randint
 
 import allure
+from allure import step
 from faker import Faker
 
 from constants import POST_CODE, FIRST_NAME
@@ -8,7 +9,6 @@ from constants import POST_CODE, FIRST_NAME
 faker = Faker()
 
 
-@allure.step("Вычисляем имя для удаления")
 def evalute_name_to_delete(names: list[str]) -> str:
     """
     Возвращает имя из списка, длина которого ближе всего к средней длине всех имен.
@@ -18,32 +18,36 @@ def evalute_name_to_delete(names: list[str]) -> str:
     avg_len = sum(names_dict.values()) / len(names)
 
     minimum = 0
-    min_key = ''
-    for key, value in names_dict.items():
-        diff = avg_len - value
+    name_to_delete = ''
+    for name, name_len in names_dict.items():
+        diff = avg_len - name_len
         if diff <= minimum:
             minimum = diff
-            min_key = key
+            name_to_delete = name
 
-    return min_key
+    return name_to_delete
 
 
 def generate_post_code() -> str:
-    return ''.join([str(randint(0, 9)) for _ in range(10)])
+    post_code = ''.join([str(randint(0, 9)) for _ in range(10)])
+    allure.dynamic.description(post_code)
+    return post_code
 
 
-@allure.step(f"Генерируем '{FIRST_NAME}' на основе значения из поля '{POST_CODE}'")
 def generate_first_name(post_code: str) -> str:
-    first_name = []
-    for i in range(0, len(post_code), 2):
-        first_name.append(int(f'{post_code[i]}{post_code[i + 1]}'))
-    result = []
-    for num in first_name:
-        if num > 25:
-            num = num % 26
-        letter = chr(ord('a') + num)
-        result.append(letter)
-    return ''.join(result)
+    with step(f"Генерируем '{FIRST_NAME}' на основе значения из поля '{POST_CODE}'"):
+        pairs = []
+        for i in range(0, len(post_code), 2):
+            pairs.append(int(f'{post_code[i]}{post_code[i + 1]}'))
+
+        first_name = []
+        for num in pairs:
+            if num > 25:
+                num = num % 26
+            letter = chr(ord('a') + num)
+            first_name.append(letter)
+
+        return ''.join(first_name)
 
 
 def generate_last_name() -> str:

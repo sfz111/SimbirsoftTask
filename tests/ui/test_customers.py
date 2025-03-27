@@ -4,7 +4,8 @@ from allure import step
 from constants import FIRST_NAME
 from helpers import evalute_name_to_delete
 
-
+@allure.suite("Менеджер банка")
+@allure.sub_suite("Полномочия менеджера")
 class TestCustomers:
     @allure.title("Создание клиента")
     def test_add_customer(self, add_customer_page):
@@ -39,5 +40,5 @@ class TestCustomers:
         with step(f"Удаляем клиента с именем '{name_to_delete}'"):
             customers_page.delete_customer(name_to_delete)
 
-        with step("Проверяем, что удаленный клиент не отображается в таблице"):
+        with step(f"Проверяем, что клиент '{name_to_delete}' не отображается в таблице"):
             customers_page.check_deleted_customer_is_invisible(name_to_delete)

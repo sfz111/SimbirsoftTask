@@ -1,3 +1,5 @@
 /.idea/.gitignore
 /.idea/vcs.xml
 allure_results
+!/.idea/vcs.xml
+!/.idea/.gitignore

@@ -26,4 +26,4 @@ jobs:
 
     - name: Run ui tests
       run: |
-        pytest tests/ui -v -n 3 --alluredir=allure-results
+        pytest tests/ui -v -n 3 --headless --alluredir=allure-results
