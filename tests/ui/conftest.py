@@ -55,7 +55,7 @@ def driver(request):
 
         driver = webdriver.Remote(
             command_executor="http://selenoid:4444/wd/hub",
-            options=Options(),
+            options=options,
         )
     else:
         driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)

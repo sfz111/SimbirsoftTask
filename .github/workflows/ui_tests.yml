@@ -1,6 +1,6 @@
 name: UI Tests
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   run-ui-tests:
