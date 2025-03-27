@@ -29,34 +29,12 @@ def pytest_exception_interact(node, call, report):
             print(f"Не удалось сохранить скриншот: {e}")
 
 
-def pytest_addoption(parser):
-    parser.addoption(
-        "--selenoid",
-        action="store_true",
-        help="run tests using Selenoid"
-    )
-
 @fixture(scope="function")
 def driver(request):
     options = Options()
     options.page_load_strategy = 'eager'
-
-    if request.config.getoption("--selenoid"):
-        # Конфигурация для Selenoid
-        options.set_capability("browserName", "chrome")
-        options.set_capability("browserVersion", "latest")
-        options.set_capability("selenoid:options", {
-            "enableVNC": True,
-            "enableVideo": False,
-            "enableLog": True
-        })
-
-        driver = webdriver.Remote(
-            command_executor="http://localhost:4444/wd/hub",
-            options=options,
-        )
-    else:
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    options.add_argument("--headless=new")
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     request.cls.driver = driver
     driver.maximize_window()
     driver.get('https://www.globalsqa.com/angularJs-protractor/BankingProject/#/manager')
