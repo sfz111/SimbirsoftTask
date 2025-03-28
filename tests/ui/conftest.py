@@ -1,12 +1,13 @@
 import allure
 import pytest
-from pytest import fixture
 from allure_commons.types import AttachmentType
+from pytest import fixture
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
+from env import MANAGER_URL
 from ui.manager.add_customer_page import AddCustomerPage
 from ui.manager.customers_page import CustomersPage
 from ui.manager.manager_page import ManagerPage
@@ -28,6 +29,7 @@ def pytest_exception_interact(node, call, report):
         except Exception as e:
             print(f"Не удалось сохранить скриншот: {e}")
 
+
 def pytest_addoption(parser):
     parser.addoption(
         "--headless",
@@ -36,8 +38,11 @@ def pytest_addoption(parser):
         help="Run tests in headless mode"
     )
 
+
 @fixture(scope="function")
 def driver(request):
+    """Инициализация драйвера"""
+
     options = Options()
     options.page_load_strategy = 'eager'
     if request.config.getoption("--headless"):
@@ -46,7 +51,7 @@ def driver(request):
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     request.cls.driver = driver
     driver.maximize_window()
-    driver.get('https://www.globalsqa.com/angularJs-protractor/BankingProject/#/manager')
+    driver.get(MANAGER_URL)
 
     yield driver
     driver.quit()

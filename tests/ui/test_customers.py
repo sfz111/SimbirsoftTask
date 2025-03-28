@@ -4,6 +4,7 @@ from allure import step
 from constants import FIRST_NAME
 from helpers import evalute_name_to_delete
 
+
 @allure.suite("Менеджер банка")
 @allure.sub_suite("Полномочия менеджера")
 class TestCustomers:
@@ -14,7 +15,7 @@ class TestCustomers:
 
         with step("Проверяем, что появилось сообщение об успешном создании клиента"):
             text = add_customer_page.switch_to_alert_and_get_text()
-            assert "Customer added successfully" in text
+            assert "Customer added successfully with customer id" in text, f"Ожидалось сообщение об успешном создании клиента, но получено: '{text}'"
 
     @allure.title("Сортировка клиентов по имени")
     def test_sort_customers(self, manager_page, customers_page):

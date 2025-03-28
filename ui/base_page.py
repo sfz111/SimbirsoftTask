@@ -1,4 +1,3 @@
-from telnetlib import EC
 from typing import Union
 
 from selenium.webdriver.remote.webelement import WebElement
@@ -14,7 +13,7 @@ class BasePage:
     def element(self, locator: tuple[str, str]) -> WebElement:
         return self.driver.find_element(*locator)
 
-    def elements(self, locator: tuple[str, str]):
+    def elements(self, locator: tuple[str, str]) -> list[WebElement]:
         return self.driver.find_elements(*locator)
 
     def input_field(self, locator: tuple[str, str], text: str):
@@ -25,8 +24,8 @@ class BasePage:
         element = self.wait.until(EC.element_to_be_clickable(locator))
         element.click()
 
-    def switch_to_alert_and_get_text(self):
-        alert = self.wait.until(EC.alert_is_present())
+    def switch_to_alert_and_get_text(self) -> str:
+        alert = self.wait.until(EC.alert_is_present(), "Алерт не появился")
         text = self.driver.switch_to.alert.text
         alert.accept()
         return text
