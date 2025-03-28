@@ -30,7 +30,6 @@ def evalute_name_to_delete(names: list[str]) -> str:
 
 def generate_post_code() -> str:
     post_code = ''.join([str(randint(0, 9)) for _ in range(10)])
-    allure.dynamic.description(post_code)
     return post_code
 
 
