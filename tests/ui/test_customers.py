@@ -44,7 +44,3 @@ class TestCustomers:
 
         with step(f"Проверяем, что клиент '{name_to_delete}' не отображается в таблице"):
             customers_page.check_deleted_customer_is_invisible(name_to_delete)
-
-
-def test():
-    assert 1 == 2
