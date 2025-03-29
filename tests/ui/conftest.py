@@ -7,10 +7,10 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
-from urls_data import MANAGER_URL
 from libraries.ui.manager.add_customer_page import AddCustomerPage
 from libraries.ui.manager.customers_page import CustomersPage
 from libraries.ui.manager.manager_page import ManagerPage
+from urls_data import MANAGER_URL
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -46,6 +46,7 @@ def driver(request):
     options = Options()
     options.page_load_strategy = 'eager'
     options.add_argument("--window-size=1920,1080")
+    options.add_argument("--ignore-certificate-errors")
     if request.config.getoption("--headless"):
         options.add_argument("--headless=new")
 

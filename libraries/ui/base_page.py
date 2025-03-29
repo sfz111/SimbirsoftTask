@@ -1,5 +1,3 @@
-from typing import Union
-
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
@@ -17,11 +15,11 @@ class BasePage:
         return self.driver.find_elements(*locator)
 
     def input_field(self, locator: tuple[str, str], text: str):
-        element = self.wait.until(EC.visibility_of_element_located(locator))
+        element = self.should_be_visible(locator, msg=f"Элемент с локатором {locator} не отображается на странице")
         element.send_keys(text)
 
-    def click(self, locator: Union[WebElement, tuple[str, str]]):
-        element = self.wait.until(EC.element_to_be_clickable(locator))
+    def click(self, locator: WebElement | tuple[str, str]):
+        element = self.should_be_clickable(locator, msg=f"Элемент с локатором {locator} не кликабелен")
         element.click()
 
     def switch_to_alert_and_get_text(self) -> str:
@@ -31,7 +29,10 @@ class BasePage:
         return text
 
     def should_be_visible(self, locator: tuple[str, str], msg: str = None):
-        self.wait.until(EC.visibility_of_element_located(locator), message=msg)
+        return self.wait.until(EC.visibility_of_element_located(locator), message=msg)
 
     def should_be_invisible(self, locator: WebElement | tuple[str, str], msg: str = None):
-        self.wait.until(EC.invisibility_of_element_located(locator), message=msg)
+        return self.wait.until(EC.invisibility_of_element_located(locator), message=msg)
+
+    def should_be_clickable(self, locator: WebElement | tuple[str, str], msg: str = None):
+        return self.wait.until(EC.element_to_be_clickable(locator), message=msg)
