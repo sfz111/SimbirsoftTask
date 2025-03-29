@@ -34,7 +34,7 @@ jobs:
         pytest tests/ui -v -n 3 --headless --alluredir=allure-results
 
     - name: Store allure results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: allure-results
         path: allure-results
@@ -54,7 +54,7 @@ jobs:
         uses: actions/download-artifact@v3
       - run: allure generate -c allure-results -o _site
       - name: Store generated report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: _site
           path: _site
