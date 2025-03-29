@@ -1,6 +1,6 @@
 from selenium.webdriver.common.by import By
 
-from ui.base_page import BasePage
+from libraries.ui.base_page import BasePage
 
 
 class ManagerPage(BasePage):

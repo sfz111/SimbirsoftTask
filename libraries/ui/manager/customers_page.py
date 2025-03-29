@@ -1,7 +1,6 @@
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
 
-from ui.base_page import BasePage
+from libraries.ui.base_page import BasePage
 
 
 class CustomersPage(BasePage):
@@ -18,8 +17,7 @@ class CustomersPage(BasePage):
 
     def get_names(self) -> list[str]:
         names = []
-        self.wait.until(EC.visibility_of_element_located(self.TABLE_BODY),
-                        "Тело таблицы клиентов не отображается на странице")
+        self.should_be_visible(self.TABLE_BODY, msg="Тело таблицы клиентов не отображается на странице")
         for element in self.elements(self.FIRST_NAME_CUSTOMER):
             names.append(element.text)
 
@@ -29,5 +27,4 @@ class CustomersPage(BasePage):
         self.click(self.DELETE_BUTTON_BY_NAME(name))
 
     def check_deleted_customer_is_invisible(self, name: str):
-        self.wait.until(EC.invisibility_of_element_located(self.TABLE_ROW(name)),
-                        f"Клиент с именем '{name}' отображается на странице")
+        self.should_be_invisible(self.TABLE_ROW(name), msg=f"Клиент с именем '{name}' не удален из таблицы")

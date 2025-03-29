@@ -29,3 +29,9 @@ class BasePage:
         text = self.driver.switch_to.alert.text
         alert.accept()
         return text
+
+    def should_be_visible(self, locator: tuple[str, str], msg: str = None):
+        self.wait.until(EC.visibility_of_element_located(locator), message=msg)
+
+    def should_be_invisible(self, locator: WebElement | tuple[str, str], msg: str = None):
+        self.wait.until(EC.invisibility_of_element_located(locator), message=msg)

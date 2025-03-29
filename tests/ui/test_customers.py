@@ -2,12 +2,13 @@ import allure
 from allure import step
 
 from constants import FIRST_NAME
-from helpers import evalute_name_to_delete
+from utils.helpers import evalute_name_to_delete
 
 
 @allure.suite("Менеджер банка")
 @allure.sub_suite("Полномочия менеджера")
 class TestCustomers:
+
     @allure.title("Создание клиента")
     def test_add_customer(self, add_customer_page):
         with step("Создаем клиента"):

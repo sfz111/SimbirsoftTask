@@ -8,9 +8,9 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
 from env import MANAGER_URL
-from ui.manager.add_customer_page import AddCustomerPage
-from ui.manager.customers_page import CustomersPage
-from ui.manager.manager_page import ManagerPage
+from libraries.ui.manager.add_customer_page import AddCustomerPage
+from libraries.ui.manager.customers_page import CustomersPage
+from libraries.ui.manager.manager_page import ManagerPage
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -45,12 +45,12 @@ def driver(request):
 
     options = Options()
     options.page_load_strategy = 'eager'
+    options.add_argument("--window-size=1920,1080")
     if request.config.getoption("--headless"):
         options.add_argument("--headless=new")
 
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     request.cls.driver = driver
-    driver.maximize_window()
     driver.get(MANAGER_URL)
 
     yield driver
