@@ -6,12 +6,13 @@ def evalute_name_to_delete(names: list[str]) -> str:
 
     avg_len = sum(names_dict.values()) / len(names)
 
-    minimum = 0
-    name_to_delete = ''
-    for name, name_len in names_dict.items():
-        diff = avg_len - name_len
-        if diff <= minimum:
-            minimum = diff
+    min_diff = None
+    name_to_delete = names[0]
+
+    for name in names:
+        diff = abs(len(name) - avg_len)
+        if min_diff is None or diff < min_diff:
+            min_diff = diff
             name_to_delete = name
 
     return name_to_delete

@@ -14,17 +14,17 @@ class AddCustomerPage(ManagerPage):
     ADD_CUSTOMER_SUBMIT_BTN = (By.CSS_SELECTOR, '[type="submit"]')
 
     def add_customer(self):
-        with step(f"Нажимаем на кнопку '{ADD_CUSTOMER}'"):
+        with step(f"Клик на кнопку '{ADD_CUSTOMER}'"):
             self.click(self.ADD_CUSTOMER_BTN)
-        with step("Проверяем, что открыта форма добавления клиента"):
+        with step("Проверка, что открыта форма добавления клиента"):
             self.should_be_visible(self.ADD_CUSTOMER_FORM, msg="Форма добавления клиента не отображается на странице")
 
-        with step(f"Заполняем поле '{POST_CODE}'"):
+        with step(f"Заполнение поля '{POST_CODE}'"):
             self.input_field(self.POST_CODE_INPUT, post_code := generate_post_code())
-        with step(f"Заполняем поле '{FIRST_NAME}'"):
+        with step(f"Заполнение поля '{FIRST_NAME}'"):
             self.input_field(self.FIRST_NAME_INPUT, text=generate_first_name(post_code))
-        with step(f"Заполняем поле '{LAST_NAME}'"):
+        with step(f"Заполнение поля '{LAST_NAME}'"):
             self.input_field(self.LAST_NAME_INPUT, text=generate_last_name())
 
-        with step(f"Нажимаем на кнопку '{ADD_CUSTOMER}'"):
+        with step(f"Клик на кнопку '{ADD_CUSTOMER}'"):
             self.click(self.ADD_CUSTOMER_SUBMIT_BTN)

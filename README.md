@@ -44,6 +44,8 @@ pytest tests/ui -v --alluredir=allure_results
 # запуск allure отчета локально
 allure serve allure_results
 ```
+### Отчет доступен по [ссылке]("https://sfz111.github.io/SimbirsoftTask/")
 Пример отчета о прохождении теста
+
 ![img.png](img.png)
 

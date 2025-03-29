@@ -7,7 +7,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
-from env import MANAGER_URL
+from urls_data import MANAGER_URL
 from libraries.ui.manager.add_customer_page import AddCustomerPage
 from libraries.ui.manager.customers_page import CustomersPage
 from libraries.ui.manager.manager_page import ManagerPage
