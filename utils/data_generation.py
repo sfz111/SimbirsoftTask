@@ -3,7 +3,7 @@ from random import randint
 from allure import step
 from faker import Faker
 
-from constants import POST_CODE, FIRST_NAME
+from utils.constants import POST_CODE, FIRST_NAME
 
 faker = Faker()
 

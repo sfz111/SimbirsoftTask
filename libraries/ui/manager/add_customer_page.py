@@ -1,7 +1,7 @@
 from allure import step
 from selenium.webdriver.common.by import By
 
-from constants import FIRST_NAME, POST_CODE, ADD_CUSTOMER, LAST_NAME
+from utils.constants import FIRST_NAME, POST_CODE, ADD_CUSTOMER, LAST_NAME
 from libraries.ui.manager.manager_page import ManagerPage
 from utils.data_generation import generate_first_name, generate_last_name, generate_post_code
 

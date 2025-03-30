@@ -10,7 +10,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from libraries.ui.manager.add_customer_page import AddCustomerPage
 from libraries.ui.manager.customers_page import CustomersPage
 from libraries.ui.manager.manager_page import ManagerPage
-from urls_data import MANAGER_URL
+from config import MANAGER_URL
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -52,7 +52,6 @@ def driver(request):
 
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     request.cls.driver = driver
-    driver.get(MANAGER_URL)
 
     yield driver
     driver.quit()
@@ -60,7 +59,7 @@ def driver(request):
 
 @fixture(scope="function")
 def manager_page(driver):
-    yield ManagerPage(driver)
+    yield ManagerPage(driver, base_url=MANAGER_URL)
 
 
 @fixture(scope="function")
@@ -71,3 +70,7 @@ def add_customer_page(driver):
 @fixture(scope="function")
 def customers_page(driver):
     yield CustomersPage(driver)
+
+@fixture(scope="function")
+def open_manager_page(manager_page):
+    manager_page.open()

@@ -4,7 +4,7 @@ from libraries.ui.base_page import BasePage
 
 
 class CustomersPage(BasePage):
-    FIRST_NAME_COLUMN = (By.XPATH, "//a[contains(@ng-click,\"sortType = 'fName'\")]")
+    FIRST_NAME_COLUMN = (By.CSS_SELECTOR, "a[ng-click*=\"sortType = 'fName'\"]")
     FIRST_NAME_CUSTOMER = (By.XPATH, "//tr[contains(@ng-repeat,'searchCustomer')]/td[1]")
     DELETE_BUTTON_BY_NAME = staticmethod(
         lambda text: (By.XPATH, f'//td[text()="{text}"]/..//button[@ng-click="deleteCust(cust)"]'))

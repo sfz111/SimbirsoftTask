@@ -2,10 +2,13 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
+from config import BASE_URL
+
 
 class BasePage:
-    def __init__(self, driver):
+    def __init__(self, driver, base_url: str = BASE_URL):
         self.driver = driver
+        self.base_url = base_url
         self.wait = WebDriverWait(driver, timeout=5)
 
     def element(self, locator: tuple[str, str]) -> WebElement:
@@ -13,6 +16,9 @@ class BasePage:
 
     def elements(self, locator: tuple[str, str]) -> list[WebElement]:
         return self.driver.find_elements(*locator)
+
+    def open(self, path: str = None):
+        self.driver.get(f"{self.base_url}{path}" if path else self.base_url)
 
     def input_field(self, locator: tuple[str, str], text: str):
         element = self.should_be_visible(locator, msg=f"Элемент с локатором {locator} не отображается на странице")

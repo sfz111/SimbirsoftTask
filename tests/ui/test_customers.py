@@ -1,12 +1,14 @@
 import allure
+import pytest
 from allure import step
 
-from constants import FIRST_NAME
+from utils.constants import FIRST_NAME
 from utils.helpers import evalute_name_to_delete
 
 
 @allure.suite("Менеджер банка")
 @allure.sub_suite("Полномочия менеджера")
+@pytest.mark.usefixtures("open_manager_page")
 class TestCustomers:
 
     @allure.title("Создание клиента")
