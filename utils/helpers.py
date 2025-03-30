@@ -2,9 +2,7 @@ def evalute_name_to_delete(names: list[str]) -> str:
     """
     Возвращает имя из списка, длина которого ближе всего к средней длине всех имен.
     """
-    names_dict = {name: len(name) for name in names}
-
-    avg_len = sum(names_dict.values()) / len(names)
+    avg_len = sum([len(name) for name in names]) / len(names)
 
     min_diff = None
     name_to_delete = names[0]
