@@ -56,7 +56,7 @@ pytest tests/ui -v --alluredir=allure_results
 allure serve allure_results
 ```
 
-### Отчет доступен по [ссылке]("https://sfz111.github.io/SimbirsoftTask/")
+### Отчет доступен по [ссылке]("https://sfz111.github.io/SimbirsoftTask/ui")
 
 Пример отчета о прохождении теста
 
@@ -100,7 +100,7 @@ pytest -k "TestEntity" --alluredir=allure_results
 allure serve allure_results
 ```
 
-### Отчет доступен по [ссылке]("https://sfz111.github.io/SimbirsoftTask/")
+### Отчет доступен по [ссылке]("https://sfz111.github.io/SimbirsoftTask/api/")
 
 Пример отчета о прохождении теста
 

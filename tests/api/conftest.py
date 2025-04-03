@@ -22,17 +22,19 @@ def entity_teardown(entity_api, request):
 @pytest.fixture(scope="function")
 def created_entity(entity_api):
     with step("Создание сущности"):
-        response = entity_api.create_entity(json=entity_data())
+        data = entity_data()
+        response = entity_api.create_entity(json=data)
         assert response.status_code == 200
         entity_id = response.json()
 
-    yield entity_id
+    yield entity_id, data
 
 
 @pytest.fixture(scope="function")
 def create_and_delete_entity(entity_api, created_entity):
-    yield created_entity
+    entity_id, data = created_entity
+    yield entity_id, data
 
     with step("Удаление сущности после теста"):
-        response = entity_api.delete_entity(id_=created_entity)
+        response = entity_api.delete_entity(id_=entity_id)
         assert response.status_code == 204
