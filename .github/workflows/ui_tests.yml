@@ -72,6 +72,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ui-report
+          path: ui-report
 
       - name: Prepare directory structure
         run: |
@@ -80,6 +81,8 @@ jobs:
 
       - name: Upload allure report
         uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site/ui
 
       - name: Deploy to GitHub Pages
         id: deployment
