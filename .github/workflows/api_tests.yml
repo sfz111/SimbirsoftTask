@@ -1,4 +1,4 @@
-name: API tests
+name: Combined Tests
 
 on: [ pull_request ]
 
@@ -8,8 +8,43 @@ permissions:
   id-token: write
 
 jobs:
+  run-ui-tests:
+    runs-on: ubuntu-latest
+    name: Run UI Tests
+
+    steps:
+      - name: Checkout tests repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies with uv
+        run: |
+          uv pip install --system -r requirements.txt
+
+      - name: Run ui tests
+        run: |
+          pytest tests/ui -v -n 3 --headless --alluredir=allure-results-ui
+        continue-on-error: true
+
+      - name: Store UI allure results
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-ui
+          path: allure-results-ui
+          retention-days: 1
+
   run-api-tests:
     runs-on: ubuntu-latest
+    name: Run API Tests
 
     steps:
       - name: Checkout Backend repository
@@ -45,52 +80,81 @@ jobs:
         run: |
           uv pip install --system -r requirements.txt
 
-      - name: Run ui tests
+      - name: Run api tests
         run: |
-          pytest -k "TestEntity" -v -n 3 --alluredir=api-allure-results
+          pytest -k "TestEntity" -v -n 3 --alluredir=allure-results-api
         continue-on-error: true
 
-      - name: Store allure results
+      - name: Store API allure results
         uses: actions/upload-artifact@v4
         with:
-          name: api-allure-results
-          path: api-allure-results
+          name: allure-results-api
+          path: allure-results-api
           retention-days: 1
 
-  generate-report:
+  generate-reports:
     runs-on: ubuntu-latest
-    needs: run-api-tests
-    name: Generate report
+    needs: [ run-ui-tests, run-api-tests ]
+    name: Generate Reports
+
     steps:
       - uses: actions/setup-java@v3
         with:
-          distribution: 'microsoft' # See 'Supported distributions' for available options
+          distribution: 'microsoft'
           java-version: '21.0.2'
+
       - run: sudo wget https://github.com/allure-framework/allure2/releases/download/2.29.0/allure-2.29.0.tgz && sudo tar -zxvf allure-2.29.0.tgz -C /opt/ && sudo ln -s /opt/allure-2.29.0/bin/allure /usr/bin/allure
-      - name: Download allure results
+
+      # Download and process UI results
+      - name: Download UI allure results
         uses: actions/download-artifact@v4
-      - run: |
-          mkdir -p _site/api
-          allure generate -c api-allure-results -o _site/api
-      - name: Store generated report
+        with:
+          name: allure-results-ui
+          path: allure-results-ui
+
+      # Download and process API results
+      - name: Download API allure results
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results-api
+          path: allure-results-api
+
+      # Generate both reports
+      - name: Generate reports
+        run: |
+          mkdir -p _site
+          allure generate -c allure-results-ui -o _site/ui --clean
+          allure generate -c allure-results-api -o _site/api --clean
+
+      - name: Store generated reports
         uses: actions/upload-artifact@v4
         with:
-          name: api-report
-          path: _site/api
+          name: test-reports
+          path: _site
           retention-days: 1
 
-  publish-report:
+  publish-reports:
     runs-on: ubuntu-latest
-    needs: generate-report
-    name: Report publication
+    needs: generate-reports
+    name: Publish Reports
+
     steps:
-      - name: Download allure results
+      - name: Download reports
         uses: actions/download-artifact@v4
-      - name: Rename to _site/api
-        run: mv api-report _site/api
-      - name: Upload allure report
+        with:
+          name: test-reports
+          path: _site
+
+      - name: Upload to GitHub Pages
         uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-      - run: echo "https://sfz111.github.io/SimbirsoftTask/api/"
+
+      - run:
+          echo "UI Report: https://sfz111.github.io/SimbirsoftTask/ui/"
+      - run:
+          echo "API Report: https://sfz111.github.io/SimbirsoftTask/api/"
