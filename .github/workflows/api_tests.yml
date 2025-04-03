@@ -1,6 +1,6 @@
 name: Combined Tests
 
-on: [ pull_request ]
+on: [pull_request]
 
 permissions:
   contents: read
@@ -52,16 +52,17 @@ jobs:
         with:
           repository: bondarenkokate73/simbirsoft_sdet_project
           path: backend
+
       - name: Set up Docker Compose
-        run: |
-          sudo apt-get install -y docker-compose
+        run: sudo apt-get install -y docker-compose
+
       - name: Run docker-compose
         run: |
           cd backend
           docker compose up -d --build
+
       - name: Wait for Backend
-        run: |
-          sleep 30
+        run: sleep 30
 
       - name: Checkout tests repository
         uses: actions/checkout@v4
@@ -94,7 +95,7 @@ jobs:
 
   generate-reports:
     runs-on: ubuntu-latest
-    needs: [ run-ui-tests, run-api-tests ]
+    needs: [run-ui-tests, run-api-tests]
     name: Generate Reports
 
     steps:
@@ -103,30 +104,31 @@ jobs:
           distribution: 'microsoft'
           java-version: '21.0.2'
 
-      - run: sudo wget https://github.com/allure-framework/allure2/releases/download/2.29.0/allure-2.29.0.tgz && sudo tar -zxvf allure-2.29.0.tgz -C /opt/ && sudo ln -s /opt/allure-2.29.0/bin/allure /usr/bin/allure
+      - name: Install Allure
+        run: |
+          sudo wget https://github.com/allure-framework/allure2/releases/download/2.29.0/allure-2.29.0.tgz
+          sudo tar -zxvf allure-2.29.0.tgz -C /opt/
+          sudo ln -s /opt/allure-2.29.0/bin/allure /usr/bin/allure
 
-      # Download and process UI results
-      - name: Download UI allure results
+      - name: Download UI results
         uses: actions/download-artifact@v4
         with:
           name: allure-results-ui
           path: allure-results-ui
 
-      # Download and process API results
-      - name: Download API allure results
+      - name: Download API results
         uses: actions/download-artifact@v4
         with:
           name: allure-results-api
           path: allure-results-api
 
-      # Generate both reports
       - name: Generate reports
         run: |
           mkdir -p _site
-          allure generate -c allure-results-ui -o _site/ui --clean
-          allure generate -c allure-results-api -o _site/api --clean
+          allure generate allure-results-ui -o _site/ui --clean
+          allure generate allure-results-api -o _site/api --clean
 
-      - name: Store generated reports
+      - name: Upload reports artifact
         uses: actions/upload-artifact@v4
         with:
           name: test-reports
@@ -151,10 +153,9 @@ jobs:
           path: _site
 
       - name: Deploy to GitHub Pages
-        id: deployment
         uses: actions/deploy-pages@v4
 
-      - run:
+      - name: Print report URLs
+        run: |
           echo "UI Report: https://sfz111.github.io/SimbirsoftTask/ui/"
-      - run:
           echo "API Report: https://sfz111.github.io/SimbirsoftTask/api/"
