@@ -72,10 +72,11 @@ allure serve allure_results
 4) requests для отправки запросов
 5) pydantic для валидации схем
 6) deepdiff для сравнения json-ов
-7) Формирования отчетов о пройденных тестах через Allure
-8) Пакетный менеджер uv
-9) Запуск тестов с помощью GitHub Actions при создании или обновлении pull request
-10) Публикация результатов в GitHub Pages
+7) curlify для генерации curl-запросов
+8) Формирования отчетов о пройденных тестах через Allure
+9) Пакетный менеджер uv
+10) Запуск тестов с помощью GitHub Actions при создании или обновлении pull request
+11) Публикация результатов в GitHub Pages
 
 ### Запуск API тестов локально
 
@@ -104,4 +105,4 @@ allure serve allure_results
 
 Пример отчета о прохождении теста
 
-![img_1.png](img_1.png)
+![img_2.png](img_2.png)
