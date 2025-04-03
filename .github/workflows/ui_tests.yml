@@ -70,10 +70,17 @@ jobs:
     steps:
       - name: Download allure results
         uses: actions/download-artifact@v4
-      - name: Rename to _site/ui
-        run: mv ui-report _site/ui
+        with:
+          name: ui-report
+
+      - name: Prepare directory structure
+        run: |
+          mkdir -p _site
+          mv ui-report _site/ui
+
       - name: Upload allure report
         uses: actions/upload-pages-artifact@v3
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
