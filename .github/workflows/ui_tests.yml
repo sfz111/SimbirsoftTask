@@ -1,4 +1,4 @@
-name: API Tests
+name: UI Tests
 
 on: [ pull_request ]
 
@@ -8,28 +8,11 @@ permissions:
   id-token: write
 
 jobs:
-  run-api-tests:
+  run-ui-tests:
     runs-on: ubuntu-latest
-    name: Run API Tests
+    name: Run UI Tests
 
     steps:
-      - name: Checkout Backend repository
-        uses: actions/checkout@v3
-        with:
-          repository: bondarenkokate73/simbirsoft_sdet_project
-          path: backend
-
-      - name: Set up Docker Compose
-        run: sudo apt-get install -y docker-compose
-
-      - name: Run docker-compose
-        run: |
-          cd backend
-          docker compose up -d --build
-
-      - name: Wait for Backend
-        run: sleep 30
-
       - name: Checkout tests repository
         uses: actions/checkout@v4
 
@@ -47,21 +30,22 @@ jobs:
         run: |
           uv pip install --system -r requirements.txt
 
-      - name: Run api tests
+      - name: Run ui tests
         run: |
-          pytest -k "TestEntity" -v -n 3 --alluredir=allure-results-api
+          pytest tests/ui -v -n 3 --headless --alluredir=allure-results-ui
         continue-on-error: true
 
-      - name: Store API allure results
+      - name: Store UI allure results
         uses: actions/upload-artifact@v4
         with:
-          name: allure-results-api
-          path: allure-results-api
+          name: allure-results-ui
+          path: allure-results-ui
           retention-days: 1
+
 
   generate-report:
     runs-on: ubuntu-latest
-    needs: [ run-api-tests ]
+    needs: [ run-ui-tests ]
     name: Generate Report
 
     steps:
@@ -76,16 +60,16 @@ jobs:
           sudo tar -zxvf allure-2.29.0.tgz -C /opt/
           sudo ln -s /opt/allure-2.29.0/bin/allure /usr/bin/allure
 
-      - name: Download API results
+      - name: Download UI results
         uses: actions/download-artifact@v4
         with:
-          name: allure-results-api
-          path: allure-results-api
+          name: allure-results-ui
+          path: allure-results-ui
 
       - name: Generate report
         run: |
           mkdir -p _site
-          allure generate allure-results-api -o _site/api --clean
+          allure generate allure-results-ui -o _site/ui --clean
 
       - name: Upload report artifact
         uses: actions/upload-artifact@v4
@@ -116,4 +100,4 @@ jobs:
 
       - name: Print report URLs
         run: |
-          echo "API Report: https://sfz111.github.io/SimbirsoftTask/api/"
+          echo "UI Report: https://sfz111.github.io/SimbirsoftTask/ui/"
