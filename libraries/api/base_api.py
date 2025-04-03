@@ -26,7 +26,7 @@ class BaseApi:
     def delete(self, request_url: str, **kwargs):
         return self._send_request(method="DELETE", request_url=request_url, **kwargs)
 
-    def _send_request(self, method: str, request_url: str, **kwargs):
+    def _send_request(self, method: str, request_url: str, **kwargs) -> Response:
         full_url = f"{self.api_url}{request_url}"
 
         with step(f"Отправка запроса {method} {full_url}"):

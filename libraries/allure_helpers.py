@@ -6,6 +6,8 @@ import requests
 
 
 def allure_attach(fn):
+    """ Декоратор для прикрепления запроса и ответа в аллюр """
+
     def wrapper(*args, **kwargs):
         body = kwargs.get('json')
         if body:

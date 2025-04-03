@@ -25,12 +25,7 @@ class TestEntity:
         with step(f"Получение созданной сущности по id {entity_id}"):
             get_response = entity_api.get_entity(id_=entity_id)
             assert get_response.status_code == 200, 'Не удалось получить созданную сущность'
-            assert get_response.json()['id'] == entity_id
-
-        with step("Проверка, что значения из ответа соответствуют значениям созданной сущности"):
-            diff = DeepDiff(created_entity_data, get_response.json(), ignore_order=True,
-                            exclude_paths=["root['id']", "root['addition']['id']"])
-            assert not diff, f"Данные в полях не совпадают:\n{format_diff(diff)}"
+            assert get_response.json()['id'] == entity_id, 'id из ответа не совпадает с id созданной сущности'
 
     @allure.title("Успешное обновление сущности")
     def test_update_entity(self, entity_api, create_and_delete_entity):
@@ -68,9 +63,9 @@ class TestEntity:
 
         with step("Проверка, что сущность получена"):
             assert response.status_code == 200, 'Не удалось получить сущность'
-            assert response.json()['id'] == entity_id
+            assert response.json()['id'] == entity_id, 'id из ответа не совпадает с id созданной сущности'
 
-        with step("Проверка, что значения в ответе содержат обновленные данные"):
+        with step("Проверка, что значения в ответе содержат данные созданной сущности"):
             diff = DeepDiff(data, response.json(), ignore_order=True,
                             exclude_paths=["root['id']", "root['addition']['id']"])
             assert not diff, f"Данные в полях не совпадают:\n{format_diff(diff)}"
