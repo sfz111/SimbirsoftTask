@@ -98,6 +98,6 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
 
-      - name: Print report URLs
+      - name: Print report URL
         run: |
           echo "UI Report: https://sfz111.github.io/SimbirsoftTask/ui/"
