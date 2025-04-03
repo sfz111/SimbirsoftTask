@@ -28,10 +28,7 @@ jobs:
           docker compose up -d --build
 
       - name: Wait for Backend
-        run: |
-          echo "Waiting for backend ..."
-          timeout 300 bash -c 'until curl -sSf http://localhost:8080/api/getAll >/dev/null; do sleep 5; done'
-          echo "Backend is responding!"
+        run: sleep 30
 
       - name: Checkout tests repository
         uses: actions/checkout@v4
