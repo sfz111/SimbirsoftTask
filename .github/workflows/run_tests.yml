@@ -3,7 +3,7 @@ name: Combined Tests and Reports
 on: [pull_request]
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -127,23 +127,63 @@ jobs:
 
       - name: Generate reports
         run: |
-          mkdir -p _site
+      
+          rm -rf _site || true
+          mkdir -p _site/{api-report,ui-report}
           
-          # Generate API report
+      
           if [ -d "allure-results/api" ]; then
-            allure generate allure-results/api -o _site/api --clean
-            echo '<base href="/SimbirsoftTask/api/">' >> _site/api/index.html
+            echo "Generating API report..."
+            allure generate allure-results/api -o _site/api-report --clean
+            find _site/api-report -type f \( -name '*.html' -o -name '*.js' \) -exec sed -i 's|/static/|./static/|g' {} \;
+            echo '<base href="/SimbirsoftTask/api-report/">' >> _site/api-report/index.html
+          else
+            echo "No API results found, creating placeholder"
+            echo "<h1>API Test Report</h1><p>No results available</p>" > _site/api-report/index.html
           fi
-          
-          # Generate UI report
+
+  
           if [ -d "allure-results/ui" ]; then
-            allure generate allure-results/ui -o _site/ui --clean
-            echo '<base href="/SimbirsoftTask/ui/">' >> _site/ui/index.html
+            echo "Generating UI report..."
+            allure generate allure-results/ui -o _site/ui-report --clean
+            find _site/ui-report -type f \( -name '*.html' -o -name '*.js' \) -exec sed -i 's|/static/|./static/|g' {} \;
+            echo '<base href="/SimbirsoftTask/ui-report/">' >> _site/ui-report/index.html
+          else
+            echo "No UI results found, creating placeholder"
+            echo "<h1>UI Test Report</h1><p>No results available</p>" > _site/ui-report/index.html
           fi
-          
-          # Create .nojekyll file
+
+        
+          cat <<EOF > _site/index.html
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Test Reports</title>
+          </head>
+          <body>
+            <h1>Available Test Reports</h1>
+            <ul>
+              <li><a href="/SimbirsoftTask/api-report/">API Tests Report</a></li>
+              <li><a href="/SimbirsoftTask/ui-report/">UI Tests Report</a></li>
+            </ul>
+          </body>
+          </html>
+          EOF
+
+       
           touch _site/.nojekyll
           echo "Disabled Jekyll processing" > _site/.nojekyll
+
+      - name: Verify reports
+        run: |
+          echo "API report files:"
+          ls -la _site/api-report/
+          
+          echo "UI report files:"
+          ls -la _site/ui-report/
+          
+          [ -f "_site/api-report/index.html" ] || echo "::error::API report missing!"
+          [ -f "_site/ui-report/index.html" ] || echo "::error::UI report missing!"
 
       - name: Upload report artifact
         uses: actions/upload-artifact@v4
@@ -173,5 +213,6 @@ jobs:
 
       - name: Print report URLs
         run: |
-          echo "API Report: https://sfz111.github.io/SimbirsoftTask/api/"
-          echo "UI Report: https://sfz111.github.io/SimbirsoftTask/ui/"
+          echo "API Report: https://sfz111.github.io/SimbirsoftTask/api-report/"
+          echo "UI Report: https://sfz111.github.io/SimbirsoftTask/ui-report/"
+          echo "Main Page: https://sfz111.github.io/SimbirsoftTask/"
