@@ -2,18 +2,22 @@ name: Deploy Reports
 
 on:
   workflow_run:
-    workflows: [ "UI Tests", "API Tests" ]
-    types: [ completed ]
+    workflows: ["UI Tests", "API Tests"]
+    types: [completed]
 
 permissions:
   contents: read
   pages: write
   id-token: write
+  actions: read
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Download UI report
         uses: actions/download-artifact@v4
         with:
@@ -30,12 +34,9 @@ jobs:
         run: |
           echo '<!DOCTYPE html>
           <html>
-          <head>
-            <title>Test Reports</title>
-            <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-          </head>
+          <head><title>Reports</title></head>
           <body>
-            <h1>Available Reports:</h1>
+            <h1>Available reports:</h1>
             <ul>
               <li><a href="/ui/">UI Tests</a></li>
               <li><a href="/api/">API Tests</a></li>
@@ -49,7 +50,7 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
 
-      - name: Print report URL
+      - name: Print URLs
         run: |
-          echo "API Report: https://sfz111.github.io/SimbirsoftTask/api/"
           echo "UI Report: https://sfz111.github.io/SimbirsoftTask/ui/"
+          echo "API Report: https://sfz111.github.io/SimbirsoftTask/api/"
