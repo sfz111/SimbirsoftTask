@@ -90,8 +90,22 @@ jobs:
 
       - name: Generate report
         run: |
-          mkdir -p _site
+          mkdir -p _site/api
           allure generate allure-results-api -o _site/api --clean
+          # Fix paths for GitHub Pages
+          find _site/api -type f \( -name '*.html' -o -name '*.js' \) -exec sed -i 's|/static/|./static/|g' {} \;
+          echo '<base href="/SimbirsoftTask/api/">' >> _site/api/index.html
+
+      - name: Add .nojekyll file
+        run: |
+          touch _site/.nojekyll
+          echo "Disabled Jekyll processing" > _site/.nojekyll
+
+      - name: Verify report structure
+        run: |
+          echo "Generated files:"
+          ls -laR _site/api
+          [ -f "_site/api/index.html" ] || { echo "Error: index.html not found"; exit 1; }
 
       - name: Upload report artifact
         uses: actions/upload-artifact@v4
@@ -123,3 +137,8 @@ jobs:
       - name: Print report URL
         run: |
           echo "API Report: https://sfz111.github.io/SimbirsoftTask/api/"
+          echo "Direct link: https://sfz111.github.io/SimbirsoftTask/api/index.html"
+          echo "If you see 404 error:"
+          echo "1. Wait 2-5 minutes for GitHub Pages to update"
+          echo "2. Check gh-pages branch in repository"
+          echo "3. Verify report files exist in Actions artifacts"

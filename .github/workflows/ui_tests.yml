@@ -42,7 +42,6 @@ jobs:
           path: allure-results-ui
           retention-days: 90
 
-
   generate-report:
     runs-on: ubuntu-latest
     needs: [ run-ui-tests ]
@@ -68,8 +67,16 @@ jobs:
 
       - name: Generate report
         run: |
-          mkdir -p _site
+          mkdir -p _site/ui
           allure generate allure-results-ui -o _site/ui --clean
+          # Фикс путей для GitHub Pages
+          find _site/ui -type f -name "*.html" -exec sed -i 's|/static/|./static/|g' {} \;
+          find _site/ui -type f -name "*.js" -exec sed -i 's|/static/|./static/|g' {} \;
+
+      - name: Add .nojekyll file
+        run: |
+          touch _site/.nojekyll
+          echo "Disabled Jekyll processing" > _site/.nojekyll
 
       - name: Upload report artifact
         uses: actions/upload-artifact@v4
@@ -90,6 +97,11 @@ jobs:
           name: test-report
           path: _site
 
+      - name: Verify report structure
+        run: |
+          ls -laR _site
+          [ -f "_site/ui/index.html" ] || exit 1
+
       - name: Upload to GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
@@ -101,3 +113,7 @@ jobs:
       - name: Print report URL
         run: |
           echo "UI Report: https://sfz111.github.io/SimbirsoftTask/ui/"
+          echo "Direct link: https://sfz111.github.io/SimbirsoftTask/ui/index.html"
+          echo "If you see 404:"
+          echo "1. Wait 2-5 minutes"
+          echo "2. Check branch gh-pages in repository"
