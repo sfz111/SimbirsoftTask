@@ -137,4 +137,4 @@ jobs:
       - name: Print report URL
         run: |
           echo "API Report: https://sfz111.github.io/SimbirsoftTask/api/"
-          echo "Direct link: https://sfz111.github.io/SimbirsoftTask/api/index.html" # Для случаев, когда основной URL не работает
+          echo "Direct link: https://sfz111.github.io/SimbirsoftTask/api/index.html  #Для случаев, когда основной URL не работает"
