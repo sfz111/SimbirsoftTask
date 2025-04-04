@@ -28,7 +28,7 @@ jobs:
           docker compose up -d --build
 
       - name: Wait for Backend
-        run: sleep 30
+        run: timeout 60 bash -c 'until docker-compose ps --services --status running | grep -q "^service$"; do sleep 2; done'
 
       - name: Checkout tests repository
         uses: actions/checkout@v4
