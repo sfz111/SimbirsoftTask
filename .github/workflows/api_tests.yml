@@ -137,8 +137,4 @@ jobs:
       - name: Print report URL
         run: |
           echo "API Report: https://sfz111.github.io/SimbirsoftTask/api/"
-          echo "Direct link: https://sfz111.github.io/SimbirsoftTask/api/index.html"
-          echo "If you see 404 error:"
-          echo "1. Wait 2-5 minutes for GitHub Pages to update"
-          echo "2. Check gh-pages branch in repository"
-          echo "3. Verify report files exist in Actions artifacts"
+          echo "Direct link: https://sfz111.github.io/SimbirsoftTask/api/index.html" # Для случаев, когда основной URL не работает

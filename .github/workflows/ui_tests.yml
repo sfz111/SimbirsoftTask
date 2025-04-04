@@ -113,7 +113,4 @@ jobs:
       - name: Print report URL
         run: |
           echo "UI Report: https://sfz111.github.io/SimbirsoftTask/ui/"
-          echo "Direct link: https://sfz111.github.io/SimbirsoftTask/ui/index.html"
-          echo "If you see 404:"
-          echo "1. Wait 2-5 minutes"
-          echo "2. Check branch gh-pages in repository"
+          echo "Direct link: https://sfz111.github.io/SimbirsoftTask/ui/index.html" # Для случаев, когда основной URL не работает
