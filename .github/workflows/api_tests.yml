@@ -28,7 +28,13 @@ jobs:
           docker compose up -d --build
 
       - name: Wait for Backend
-        run: timeout 60 bash -c 'until docker-compose ps --services --status running | grep -q "^service$"; do sleep 2; done'
+        run: |
+          timeout 120 bash -c '
+            until [ "$(docker inspect -f "{{.State.Status}}" service)" = "running" ]; do
+              echo "Waiting for container to start...";
+              sleep 5;
+            done
+          '
 
       - name: Checkout tests repository
         uses: actions/checkout@v4
@@ -92,7 +98,7 @@ jobs:
         with:
           name: test-report
           path: _site
-          retention-days: 1
+          retention-days: 90
 
   publish-report:
     runs-on: ubuntu-latest
