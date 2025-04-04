@@ -2,8 +2,11 @@ name: Deploy Reports
 
 on:
   workflow_run:
-    workflows: ["UI Tests", "API Tests"]
-    types: [completed]
+    workflows: [ "UI Tests", "API Tests" ]
+    branches: [ "*" ]
+    types:
+      - completed
+  workflow_dispatch: { }
 
 permissions:
   contents: read
@@ -15,37 +18,52 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
+
 
       - name: Download UI report
         uses: actions/download-artifact@v4
         with:
           name: ui-report
           path: _site/ui
+          if-no-files-found: error
 
       - name: Download API report
         uses: actions/download-artifact@v4
         with:
           name: api-report
           path: _site/api
+          if-no-files-found: error
+
 
       - name: Create index.html
         run: |
+          mkdir -p _site
           echo '<!DOCTYPE html>
           <html>
-          <head><title>Reports</title></head>
+          <head>
+            <title>Test Reports</title>
+            <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+          </head>
           <body>
-            <h1>Available reports:</h1>
+            <h1>Available Reports:</h1>
             <ul>
-              <li><a href="/ui/">UI Tests</a></li>
-              <li><a href="/api/">API Tests</a></li>
+              <li><a href="./ui/">UI Tests</a></li>
+              <li><a href="./api/">API Tests</a></li>
             </ul>
           </body>
           </html>' > _site/index.html
 
       - name: Add .nojekyll
         run: touch _site/.nojekyll
+
+
+      - name: Validate files
+        run: |
+          [ -f "_site/ui/index.html" ] || exit 1
+          [ -f "_site/api/index.html" ] || exit 1
+          echo "All reports are valid"
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
@@ -54,3 +72,4 @@ jobs:
         run: |
           echo "UI Report: https://sfz111.github.io/SimbirsoftTask/ui/"
           echo "API Report: https://sfz111.github.io/SimbirsoftTask/api/"
+          echo "Main page: https://sfz111.github.io/SimbirsoftTask/"
