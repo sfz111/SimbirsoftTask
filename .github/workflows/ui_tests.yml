@@ -76,7 +76,7 @@ jobs:
         with:
           name: test-report
           path: _site
-          retention-days: 1
+          retention-days: 90
 
   publish-report:
     runs-on: ubuntu-latest
