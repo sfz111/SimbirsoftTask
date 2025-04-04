@@ -1,6 +1,6 @@
 name: API Tests
 
-on: [ pull_request ]
+on: [pull_request]
 
 permissions:
   contents: read
@@ -10,8 +10,6 @@ permissions:
 jobs:
   run-api-tests:
     runs-on: ubuntu-latest
-    name: Run API Tests
-
     steps:
       - name: Checkout Backend repository
         uses: actions/checkout@v3
@@ -49,7 +47,7 @@ jobs:
           curl -LsSf https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
-      - name: Install dependencies with uv
+      - name: Install dependencies
         run: |
           uv pip install --system -r requirements.txt
 
@@ -67,9 +65,7 @@ jobs:
 
   generate-report:
     runs-on: ubuntu-latest
-    needs: [ run-api-tests ]
-    name: Generate Report
-
+    needs: [run-api-tests]
     steps:
       - uses: actions/setup-java@v3
         with:
@@ -90,51 +86,26 @@ jobs:
 
       - name: Generate report
         run: |
-          mkdir -p _site/api
-          allure generate allure-results-api -o _site/api --clean
-          # Fix paths for GitHub Pages
-          find _site/api -type f \( -name '*.html' -o -name '*.js' \) -exec sed -i 's|/static/|./static/|g' {} \;
-          echo '<base href="/SimbirsoftTask/api/">' >> _site/api/index.html
+          mkdir -p report-api/api
+          allure generate allure-results-api -o report-api/api --clean
+          
+          find report-api/api -type f \( -name '*.html' -o -name '*.js' \) -exec sed -i 's|/static/|./static/|g' {} \;
+          echo '<base href="/SimbirsoftTask/api/">' >> report-api/api/index.html
 
       - name: Add .nojekyll file
         run: |
-          touch _site/.nojekyll
-          echo "Disabled Jekyll processing" > _site/.nojekyll
+          touch report-api/.nojekyll
+          echo "Disabled Jekyll processing" > report-api/.nojekyll
 
       - name: Verify report structure
         run: |
           echo "Generated files:"
-          ls -laR _site/api
-          [ -f "_site/api/index.html" ] || { echo "Error: index.html not found"; exit 1; }
+          ls -laR report-api/api
+          [ -f "report-api/api/index.html" ] || { echo "Error: index.html not found"; exit 1; }
 
-      - name: Upload report artifact
+      - name: Upload API report only
         uses: actions/upload-artifact@v4
         with:
-          name: test-report
-          path: _site
+          name: api-report
+          path: report-api
           retention-days: 90
-
-  publish-report:
-    runs-on: ubuntu-latest
-    needs: generate-report
-    name: Publish Report
-
-    steps:
-      - name: Download report
-        uses: actions/download-artifact@v4
-        with:
-          name: test-report
-          path: _site
-
-      - name: Upload to GitHub Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site
-
-      - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
-
-      - name: Print report URL
-        run: |
-          echo "API Report: https://sfz111.github.io/SimbirsoftTask/api/"
-          echo "Direct link: https://sfz111.github.io/SimbirsoftTask/api/index.html  #Для случаев, когда основной URL не работает"

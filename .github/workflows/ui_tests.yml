@@ -63,49 +63,16 @@ jobs:
 
       - name: Generate report
         run: |
-          mkdir -p _site/ui
-          allure generate allure-results-ui -o _site/ui --clean
+          mkdir -p report-ui/ui
+          allure generate allure-results-ui -o report-ui/ui --clean
           
-          find _site/ui -type f \( -name '*.html' -o -name '*.js' \) -exec sed -i 's|/static/|./static/|g' {} \;
-          echo '<base href="/SimbirsoftTask/ui/">' >> _site/ui/index.html
+          find report-ui/ui -type f \( -name '*.html' -o -name '*.js' \) -exec sed -i 's|/static/|./static/|g' {} \;
+          echo '<base href="/SimbirsoftTask/ui/">' >> report-ui/ui/index.html
 
-      - name: Add .nojekyll file
-        run: |
-          touch _site/.nojekyll
-          echo "Disabled Jekyll processing" > _site/.nojekyll
-
-      - name: Verify report structure
-        run: |
-          echo "Generated files:"
-          ls -laR _site/ui
-          [ -f "_site/ui/index.html" ] || { echo "Error: index.html not found"; exit 1; }
-
-      - name: Upload report artifact
+      - name: Upload UI report only
         uses: actions/upload-artifact@v4
         with:
-          name: test-report
-          path: _site
+          name: ui-report
+          path: report-ui
           retention-days: 90
 
-  publish-report:
-    runs-on: ubuntu-latest
-    needs: generate-report
-    steps:
-      - name: Download report
-        uses: actions/download-artifact@v4
-        with:
-          name: test-report
-          path: _site
-
-      - name: Upload to GitHub Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site
-
-      - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
-
-      - name: Print report URL
-        run: |
-          echo "UI Report: https://sfz111.github.io/SimbirsoftTask/ui/"
-          echo "Direct link: https://sfz111.github.io/SimbirsoftTask/ui/index.html  #Для случаев, когда основной URL не работает"
