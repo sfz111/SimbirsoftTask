@@ -1,0 +1,166 @@
+name: Independent Tests with Reports
+
+on: [ pull_request ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  run-ui-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout tests repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: |
+          uv pip install --system -r requirements.txt
+
+      - name: Run ui tests
+        run: |
+          pytest tests/ui -v -n 3 --headless --alluredir=allure-results/ui
+        continue-on-error: true
+
+      - name: Store UI allure results
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-ui
+          path: allure-results/ui
+          retention-days: 90
+
+  run-api-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Backend repository
+        uses: actions/checkout@v3
+        with:
+          repository: bondarenkokate73/simbirsoft_sdet_project
+          path: backend
+
+      - name: Set up Docker Compose
+        run: sudo apt-get install -y docker-compose
+
+      - name: Run docker-compose
+        run: |
+          cd backend
+          docker compose up -d --build
+
+      - name: Wait for Backend
+        run: |
+          timeout 120 bash -c '
+            until [ "$(docker inspect -f "{{.State.Status}}" service)" = "running" ]; do
+              echo "Waiting for container to start...";
+              sleep 5;
+            done
+          '
+
+      - name: Checkout tests repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: |
+          uv pip install --system -r requirements.txt
+
+      - name: Run api tests
+        run: |
+          pytest -k "TestEntity" -v -n 3 --alluredir=allure-results/api
+        continue-on-error: true
+
+      - name: Store API allure results
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-api
+          path: allure-results/api
+          retention-days: 90
+
+  generate-reports:
+    runs-on: ubuntu-latest
+    needs:
+      - run-ui-tests
+      - run-api-tests
+    if: always()
+    steps:
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'microsoft'
+          java-version: '21.0.2'
+
+      - name: Install Allure
+        run: |
+          sudo wget https://github.com/allure-framework/allure2/releases/download/2.29.0/allure-2.29.0.tgz
+          sudo tar -zxvf allure-2.29.0.tgz -C /opt/
+          sudo ln -s /opt/allure-2.29.0/bin/allure /usr/bin/allure
+
+      - name: Download UI results (if available)
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results-ui
+          path: allure-results/ui
+        continue-on-error: true
+
+      - name: Download API results (if available)
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results-api
+          path: allure-results/api
+        continue-on-error: true
+
+      - name: Generate reports
+        run: |
+          mkdir -p combined-report
+          
+          if [ -d "allure-results/ui" ]; then
+            allure generate allure-results/ui -o combined-report/ui --clean
+            find combined-report/ui -type f \( -name '*.html' -o -name '*.js' \) -exec sed -i 's|/static/|./static/|g' {} \;
+            echo '<base href="/SimbirsoftTask/ui/">' >> combined-report/ui/index.html
+          else
+            echo "No UI test results found"
+          fi
+          
+          if [ -d "allure-results/api" ]; then
+            allure generate allure-results/api -o combined-report/api --clean
+            find combined-report/api -type f \( -name '*.html' -o -name '*.js' \) -exec sed -i 's|/static/|./static/|g' {} \;
+            echo '<base href="/SimbirsoftTask/api/">' >> combined-report/api/index.html
+          else
+            echo "No API test results found"
+          fi
+          
+          touch combined-report/.nojekyll
+          echo "Disabled Jekyll processing" > combined-report/.nojekyll
+
+      - name: Print Report URLs
+        run: |
+          echo "UI Report: https://sfz111.github.io/SimbirsoftTask/ui/"
+          echo "API Report: https://sfz111.github.io/SimbirsoftTask/api/"
+          echo "Main page: https://sfz111.github.io/SimbirsoftTask/"
+          echo ""
+          echo "Note: Reports will be available after deployment to GitHub Pages"
+
+      - name: Upload combined report
+        uses: actions/upload-artifact@v4
+        with:
+          name: combined-test-report
+          path: combined-report
+          retention-days: 90
