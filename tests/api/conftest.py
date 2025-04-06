@@ -3,7 +3,7 @@ from allure import step
 
 from config import API_URL
 from libraries.api.entity_api import EntityApi
-from tests.api.data_generation import entity_data
+from libraries.api.models.post_entity_models import EntityPostRequest
 
 
 @pytest.fixture(scope="function")
@@ -22,7 +22,7 @@ def entity_teardown(entity_api, request):
 @pytest.fixture(scope="function")
 def created_entity(entity_api):
     with step("Создание сущности"):
-        data = entity_data()
+        data = EntityPostRequest().model_dump()
         response = entity_api.create_entity(json=data)
         assert response.status_code == 200
         entity_id = response.json()

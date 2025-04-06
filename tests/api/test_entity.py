@@ -2,8 +2,8 @@ import allure
 from allure import step
 from deepdiff import DeepDiff
 
+from libraries.api.models.post_entity_models import EntityPostRequest
 from tests.api.conftest import entity_api
-from tests.api.data_generation import entity_data
 from utils.helpers import format_diff
 
 
@@ -14,8 +14,7 @@ class TestEntity:
     @allure.title("Успешное создание сущности с обязательными полями")
     def test_create_entity(self, entity_api, request, entity_teardown):
         with step("Создание сущности"):
-            created_entity_data = entity_data()
-            response = entity_api.create_entity(json=created_entity_data)
+            response = entity_api.create_entity(json=EntityPostRequest().model_dump())
 
         with step("Проверка, что сущность создана"):
             assert response.status_code == 200, 'Не удалось создать сущность'
@@ -31,7 +30,7 @@ class TestEntity:
     def test_update_entity(self, entity_api, create_and_delete_entity):
         entity_id, _ = create_and_delete_entity
         with step("Обновление сущности"):
-            new_data = entity_data()
+            new_data = EntityPostRequest().model_dump()
             response = entity_api.update_entity(id_=entity_id, json=new_data)
 
         with step("Проверка, что сущность обновлена"):
