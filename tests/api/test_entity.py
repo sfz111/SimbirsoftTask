@@ -1,7 +1,10 @@
+from http import HTTPStatus
+
 import allure
 from allure import step
 from deepdiff import DeepDiff
 
+from libraries.api.asserts.common_asserts import check_status_code
 from tests.api.conftest import entity_api
 from tests.api.data_generation import entity_data
 from utils.helpers import format_diff
@@ -18,13 +21,13 @@ class TestEntity:
             response = entity_api.create_entity(json=created_entity_data)
 
         with step("Проверка, что сущность создана"):
-            assert response.status_code == 200, 'Не удалось создать сущность'
+            check_status_code(response, expected_status=HTTPStatus.OK, msg='Не удалось создать сущность')
             entity_id = response.json()
             request.node.entity_id = entity_id
 
         with step(f"Получение созданной сущности по id {entity_id}"):
             get_response = entity_api.get_entity(id_=entity_id)
-            assert get_response.status_code == 200, 'Не удалось получить созданную сущность'
+            check_status_code(response, expected_status=HTTPStatus.OK, msg='Не удалось получить созданную сущность')
             assert get_response.json()['id'] == entity_id, 'id из ответа не совпадает с id созданной сущности'
 
     @allure.title("Успешное обновление сущности")
@@ -35,11 +38,11 @@ class TestEntity:
             response = entity_api.update_entity(id_=entity_id, json=new_data)
 
         with step("Проверка, что сущность обновлена"):
-            assert response.status_code == 204, 'Не удалось обновить сущность'
+            check_status_code(response, expected_status=HTTPStatus.NO_CONTENT, msg='Не удалось обновить сущность')
 
         with step(f"Получение созданной сущности по id {entity_id}"):
             get_response = entity_api.get_entity(id_=entity_id)
-            assert get_response.status_code == 200, 'Не удалось получить сущность'
+            check_status_code(response, expected_status=HTTPStatus.OK, msg='Не удалось получить сущность')
 
         with step("Проверка, что значения в ответе содержат обновленные данные"):
             diff = DeepDiff(new_data, get_response.json(), ignore_order=True,
@@ -53,7 +56,7 @@ class TestEntity:
             response = entity_api.delete_entity(id_=entity_id)
 
         with step("Проверка, что сущность удалена"):
-            assert response.status_code == 204, 'Не удалось удалить сущность'
+            check_status_code(response, expected_status=HTTPStatus.NO_CONTENT, msg='Не удалось удалить сущность')
 
     @allure.title("Успешное получение данных существующей сущности")
     def test_get_entity(self, entity_api, create_and_delete_entity):
@@ -62,7 +65,7 @@ class TestEntity:
             response = entity_api.get_entity(id_=entity_id)
 
         with step("Проверка, что сущность получена"):
-            assert response.status_code == 200, 'Не удалось получить сущность'
+            check_status_code(response, expected_status=HTTPStatus.OK, msg='Не удалось получить сущность')
             assert response.json()['id'] == entity_id, 'id из ответа не совпадает с id созданной сущности'
 
         with step("Проверка, что значения в ответе содержат данные созданной сущности"):
@@ -76,5 +79,5 @@ class TestEntity:
             response = entity_api.get_entities()
 
         with step("Проверка, что возвращается список сущностей"):
-            assert response.status_code == 200, 'Не удалось получить список сущностей'
+            check_status_code(response, expected_status=HTTPStatus.OK, msg='Не удалось получить список сущностей')
             assert len(response.json()) > 0, 'В списке не оказалось сущностей'
