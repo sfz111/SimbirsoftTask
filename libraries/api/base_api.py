@@ -5,7 +5,7 @@ import structlog
 from allure import step
 from requests import session, Response
 
-from utils.allure_helpers import allure_attach
+from libraries.allure_helpers import allure_attach
 from utils.logger import configure_logger
 
 
